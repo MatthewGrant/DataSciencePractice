@@ -1,0 +1,16 @@
+{
+    "contents" : "setwd(\"~/Data Science/DataDriven/BloodDonations\")\nTrain = read.csv(\"train.csv\", stringsAsFactors=FALSE)\nTest =  read.csv(\"test.csv\", stringsAsFactors=FALSE)\n\nstr(Train)\n\nTrain$Average.Donation.Period =  (Train$Months.since.First.Donation / Train$Number.of.Donations) \nTrain$First.Last.ratio = (Train$Months.since.First.Donation / Train$Months.since.Last.Donation) \n\n \nTest$Average.Donation.Period =  (Test$Months.since.First.Donation / Test$Number.of.Donations) \nTest$First.Last.ratio = (Test$Months.since.First.Donation / Test$Months.since.Last.Donation) \n\nis.na(Train$First.Last.ratio) <- do.call(cbind,lapply(Train$First.Last.ratio, is.infinite))\nis.na(Test$First.Last.ratio) <- do.call(cbind,lapply(Test$First.Last.ratio, is.infinite))\n\n#Train$Last.First.ratio = NULL \n\nstr(Train)\nstr(Test)\n\n#Simple multivarate Log regresstion\nglmfit = glm(Made.Donation.in.March.2007 ~. - X - Total.Volume.Donated..c.c.., data=Train, family = binomial)\nPredTestglm = predict(glmfit, newdata=Test, type=\"response\")\n\n\n# Regression Trees \ninstall.packages(\"rpart\")\nlibrary(rpart)\n\nTree = rpart(Made.Donation.in.March.2007 ~. - X - Total.Volume.Donated..c.c.., data = Train, method=\"class\", minbucket=25)\n\n\n#Random Forest \ninstall.packages(\"randomForest\")\nlibrary(randomForest)\n\n# Build random forest model\nForest = randomForest(Made.Donation.in.March.2007 ~. - X - Total.Volume.Donated..c.c.., data = Train, ntree=200, nodesize=25 )\n\nPredictForest = predict(Forest, newdata = Test)\ntable(Test$Made.Donation.in.March.2007, PredictForest)\n\n#(40+74)/(40+37+19+74)\n\n#regression trees boosting gbm \ninstall.packages(\"gbm\")\nlibrary(gbm)\ngbmfit = gbm(Made.Donation.in.March.2007 ~. - X - Total.Volume.Donated..c.c.., data=Train, n.trees=500,interaction.depth=2, distribution=\"bernoulli\",shrinkage=0.005,cv.folds = 5 )\nPredTest = predict(glmfit, newdata=Test, n.trees=500, type=\"response\")\n\n\n#XGBoost\ninstall.packages(\"RTools\")\nlibrary(RTools)\ninstall.packages(\"devtools\")\ndevtools::install_github('dmlc/xgboost', subdir='R-package')\ninstall.packages('xgboost')\nrequire(xgboost)\n\nparam = list(subsample = .5)\nwatchlist = list(logloss)\ndTrain = xgb.DMatrix(Train)\nxgbfit = xgb.train(Made.Donation.in.March.2007 ~. - X - Total.Volume.Donated..c.c.., param,  Dtrain , objective = \"binary:logistic\" , watchlist, verbose=1)\nPredTestglm = predict(glmfit, newdata=Test, type=\"response\")\n\n\n# Submission File\nmy_predictions = data.frame( Test$X, \"Made Donation in March 2007\" = PredTest)\n\nsubmission_format = read.csv(\"BloodDonationSubmissionFormat.csv\", check.names=FALSE)\n\ncolnames(my_predictions) = colnames(submission_format)\n\nwrite.csv(my_predictions, \"my_predictions_5glm.csv\", row.names=FALSE)",
+    "created" : 1430928919403.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2885248220",
+    "id" : "2B4E9466",
+    "lastKnownWriteTime" : 1431120809,
+    "path" : "~/Data Science/DataDriven/BloodDonations/BloodDonations.R",
+    "project_path" : "BloodDonations.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

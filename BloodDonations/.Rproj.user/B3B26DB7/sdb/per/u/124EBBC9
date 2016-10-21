@@ -1,0 +1,17 @@
+{
+    "contents" : "install.packages(\"rjson\")\nlibrary(rjson)\n\nsetwd(\"X:/Users/Matthew Grant/Desktop\")\n\nMy_Locations = fromJSON(LocationHistory.json)\n\nstr(My_locations)",
+    "created" : 1431052423697.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "62869462",
+    "id" : "124EBBC9",
+    "lastKnownWriteTime" : 19140500287389806,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
